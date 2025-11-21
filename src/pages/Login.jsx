@@ -26,7 +26,7 @@ const Login = () => {
     if (success) {
       navigate('/dashboard');
     } else {
-      setError('Invalid credentials. Try: admin / password123');
+      setError('Invalid credentials');
     }
   };
 
