@@ -5,7 +5,7 @@ const InstituteList = () => {
   const [institutes, setInstitutes] = useState([]);
   const [statusFilter, setStatusFilter] = useState("");
   const [loading, setLoading] = useState(false);
-  const [actionLoading, setActionLoading] = useState(null); // holds id of current action
+  const [actionLoading, setActionLoading] = useState(null);
   const [error, setError] = useState("");
 
   const fetchInstitutes = async () => {
@@ -26,7 +26,7 @@ const InstituteList = () => {
   }, [statusFilter]);
 
   const handleApprove = async (id, wallet) => {
-    setActionLoading(id); // show loading for this specific button
+    setActionLoading(id);
     try {
       await approveInsititute(id, wallet);
       await fetchInstitutes();
@@ -50,7 +50,8 @@ const InstituteList = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto mt-10 bg-white/80 backdrop-blur-xl border border-gray-100 rounded-2xl shadow-xl p-6">
+    <div className="max-w-6xl mx-auto mt-5 bg-white/80 backdrop-blur-xl border border-gray-100 rounded-2xl shadow-md p-5">
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
         <h3 className="text-2xl font-bold text-gray-800 tracking-tight">
@@ -60,7 +61,7 @@ const InstituteList = () => {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 text-sm rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 px-3 py-2 transition"
+          className="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 text-sm rounded-xl shadow-sm px-3 py-2 focus:ring-2 focus:ring-indigo-400 transition"
         >
           <option value="">All Status</option>
           <option value="pending">Pending</option>
@@ -68,7 +69,7 @@ const InstituteList = () => {
         </select>
       </div>
 
-      {/* Loading & Error */}
+      {/* Loading */}
       {loading && (
         <div className="text-center text-gray-500 py-10 animate-pulse">
           <div className="w-12 h-12 border-4 border-indigo-400 border-t-transparent rounded-full mx-auto mb-4 animate-spin"></div>
@@ -78,9 +79,11 @@ const InstituteList = () => {
 
       {error && <p className="text-center text-red-500 font-medium py-3">{error}</p>}
 
-      {/* Table */}
+      {/* ===============================================================
+          WEB TABLE  (hidden on mobile)
+      ============================================================== */}
       {!loading && !error && (
-        <div className="overflow-x-auto rounded-xl border border-gray-100 shadow-sm">
+        <div className="hidden sm:block overflow-x-auto rounded-xl border border-gray-100 shadow-sm">
           <table className="min-w-full text-sm text-left">
             <thead className="sticky top-0 bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow">
               <tr>
@@ -95,15 +98,10 @@ const InstituteList = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {institutes.length > 0 ? (
                 institutes.map((inst) => (
-                  <tr
-                    key={inst._id}
-                    className="hover:bg-indigo-50/70 transition-all duration-200"
-                  >
-                    <td className="px-5 py-3 text-gray-800 font-medium whitespace-nowrap">
-                      {inst.name}
-                    </td>
-                    <td className="px-5 py-3 text-gray-600">{inst.instituteCode}</td>
-                    <td className="px-5 py-3 text-gray-600">{inst.email}</td>
+                  <tr key={inst._id} className="hover:bg-indigo-50/70 transition">
+                    <td className="px-5 py-3 font-medium">{inst.name}</td>
+                    <td className="px-5 py-3">{inst.instituteCode}</td>
+                    <td className="px-5 py-3">{inst.email}</td>
                     <td className="px-5 py-3">
                       <span
                         className={`px-3 py-1 text-xs font-semibold rounded-full ${
@@ -115,44 +113,32 @@ const InstituteList = () => {
                         {inst.status || "pending"}
                       </span>
                     </td>
+
+                    {/* Actions */}
                     <td className="px-5 py-3 text-center">
                       {inst.status !== "approved" ? (
                         <button
                           onClick={() => handleApprove(inst._id, inst.walletAddress)}
                           disabled={actionLoading === inst._id}
-                          className={`px-4 py-2 rounded-xl font-medium text-sm text-white transition shadow-sm ${
+                          className={`px-4 py-2 rounded-xl text-white text-sm shadow ${
                             actionLoading === inst._id
                               ? "bg-green-400 cursor-not-allowed"
                               : "bg-green-500 hover:bg-green-600"
                           }`}
                         >
-                          {actionLoading === inst._id ? (
-                            <div className="flex items-center justify-center gap-2">
-                              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                              <span>Approving...</span>
-                            </div>
-                          ) : (
-                            "Approve"
-                          )}
+                          {actionLoading === inst._id ? "Approving..." : "Approve"}
                         </button>
                       ) : (
                         <button
                           onClick={() => handleRevoke(inst._id, inst.walletAddress)}
                           disabled={actionLoading === inst._id}
-                          className={`px-4 py-2 rounded-xl font-medium text-sm text-white transition shadow-sm ${
+                          className={`px-4 py-2 rounded-xl text-white text-sm shadow ${
                             actionLoading === inst._id
                               ? "bg-red-400 cursor-not-allowed"
                               : "bg-red-500 hover:bg-red-600"
                           }`}
                         >
-                          {actionLoading === inst._id ? (
-                            <div className="flex items-center justify-center gap-2">
-                              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                              <span>Revoking...</span>
-                            </div>
-                          ) : (
-                            "Revoke"
-                          )}
+                          {actionLoading === inst._id ? "Revoking..." : "Revoke"}
                         </button>
                       )}
                     </td>
@@ -160,16 +146,81 @@ const InstituteList = () => {
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan="5"
-                    className="text-center text-gray-500 py-8 text-sm"
-                  >
+                  <td colSpan={5} className="text-center py-8 text-gray-500">
                     No institutes found.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* ===============================================================
+          MOBILE CARDS  (visible only on mobile)
+      ============================================================== */}
+      {!loading && !error && (
+        <div className="sm:hidden space-y-4 mt-4">
+          {institutes.length > 0 ? (
+            institutes.map((inst) => (
+              <div
+                key={inst._id}
+                className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm"
+              >
+                <div className="flex justify-between items-center mb-2">
+                  <h4 className="text-lg font-semibold">{inst.name}</h4>
+                  <span
+                    className={`px-2.5 py-1 text-xs font-semibold rounded-full ${
+                      inst.status === "approved"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}
+                  >
+                    {inst.status || "pending"}
+                  </span>
+                </div>
+
+                <p className="text-sm text-gray-600">
+                  <span className="font-medium">Code:</span> {inst.instituteCode}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <span className="font-medium">Email:</span> {inst.email}
+                </p>
+
+                <div className="mt-4">
+                  {inst.status !== "approved" ? (
+                    <button
+                      onClick={() => handleApprove(inst._id, inst.walletAddress)}
+                      disabled={actionLoading === inst._id}
+                      className={`w-full px-4 py-2 rounded-lg text-white font-medium shadow ${
+                        actionLoading === inst._id
+                          ? "bg-green-400"
+                          : "bg-green-500 hover:bg-green-600"
+                      }`}
+                    >
+                      {actionLoading === inst._id ? "Approving..." : "Approve"}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleRevoke(inst._id, inst.walletAddress)}
+                      disabled={actionLoading === inst._id}
+                      className={`w-full px-4 py-2 rounded-lg text-white font-medium shadow ${
+                        actionLoading === inst._id
+                          ? "bg-red-400"
+                          : "bg-red-500 hover:bg-red-600"
+                      }`}
+                    >
+                      {actionLoading === inst._id ? "Revoking..." : "Revoke"}
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-center text-gray-500 py-4">
+              No institutes found.
+            </p>
+          )}
         </div>
       )}
     </div>
